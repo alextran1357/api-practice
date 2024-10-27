@@ -2,7 +2,7 @@ const express = require('express')
 const pool = require('./db')
 
 const app = express();
-const PORT = 3000;
+const PORT = 5000;
 
 app.use(express.json())
 
@@ -35,7 +35,7 @@ app.post('/add_product', async (req, res) => {
 app.get('/get_shopping_cart', async (req, res) => {
   try {
     const result = await pool.query('SELECT * from shopping_cart')
-    res.status(201).json({ message: result.rows})
+    res.status(200).json({ message: result.rows[0]})
   } catch(error) {
     console.log(error)
     res.status(500).json({ error: "There was an error grabbing shopping cart: ", error})
@@ -57,5 +57,19 @@ app.post('/remove_product', async (req, res) => {
   } catch(error) {
     console.log(error)
     res.status(500).json({ error: "There was an error removing database row" })
+  }
+})
+
+app.get('/get_contacts', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT c.first_name, c.last_name, c.email 
+      FROM CONTACT c 
+      WHERE activity=DATE '2022-10-1' 
+      ORDER BY c.last_name ASC`)
+    res.status(200).json({ message: result.rows})
+  } catch(error) {
+    console.log(error)
+    res.status(500).json({ error: "Error getting contacts"})
   }
 })
